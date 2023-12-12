@@ -38,7 +38,7 @@ const Input: React.FC<PropsFromRedux> = ({ fromLocationName, toLocationName, rou
         method: 'post',
         headers : {
           'Content-Type': 'application/json',
-          'X-Api-Key': 'T6b28rhHdF3j3N2fqntTRpJ3Mt38bbQL',
+          'X-Api-Key': process.env.NEXT_PUBLIC_API_KEY || '',
         },
         body: JSON.stringify(formData)
       }).then(response => response.json())

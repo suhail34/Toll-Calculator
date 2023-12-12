@@ -2,6 +2,7 @@
   "name": "toll-calculator",
   "version": "0.1.0",
   "private": true,
+  "proxy": "https://apis.tollguru.com/toll/v2/complete-polyline-from-mapping-service",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

@@ -5,8 +5,6 @@ import { ConnectedProps, connect } from "react-redux";
 import { encode } from '@googlemaps/polyline-codec';
 import { useState } from "react";
 import * as dotenv from 'dotenv';
-import axios, { AxiosRequestConfig } from "axios";
-import { LatLng, LatLngTuple } from "leaflet";
 
 dotenv.config();
 
@@ -27,11 +25,11 @@ type PropsFromRedux = ConnectedProps<typeof connector>;
 
 
 const Input: React.FC<PropsFromRedux> = ({ fromLocationName, toLocationName, routeWayPoints }) => {
-  const [respData, setRespData] = useState<any>();
+  const [respData, setRespData] = useState<any>(null);
   const [formData, setFormData] = useState({
     mapProvider: 'here',
     polyline: '',
-  })
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,31 +39,22 @@ const Input: React.FC<PropsFromRedux> = ({ fromLocationName, toLocationName, rou
         ...prevData,
         polyline: encodeData,
       }));
-      console.log(encodeData);
-      const headers = {
-        'Content-Type': 'application/json',
-        'x-api-key' : process.env.NEXT_PUBLIC_API_KEY || '',
-      }
-      const Config: RequestInit = {
-        headers: headers,
-        method: 'POST',
+      fetch("https://apis.tollguru.com/toll/v2/complete-polyline-from-mapping-service", {
+        method: 'post',
+        headers : {
+          'Content-Type': 'application/json',
+          'X-Api-Key': 'T6b28rhHdF3j3N2fqntTRpJ3Mt38bbQL',
+        },
         body: JSON.stringify(formData)
-      }
-      try {
-        const resp = await fetch("https://apis.tollguru.com/toll/v2/complete-polyline-from-mapping-service", Config);
-        if(!resp.ok) {
-            throw new Error(`HTTP error! Status : ${resp.status}`);
-        }
-        const respData = await resp.json();
-        setRespData(respData);
-        console.log('Response : ', respData);
-      } catch(err) {
-        console.error('Error : ',err);
-      }
+      }).then(response => response.json())
+      .then(data => {
+        console.log(data);
+        setRespData(data);
+      })
+      .catch(error => console.error('Error : ', error));
     } else {
       console.error("Route waypoints are null");
     }
-    console.log(formData);
   }
 
   return (
@@ -76,7 +65,7 @@ const Input: React.FC<PropsFromRedux> = ({ fromLocationName, toLocationName, rou
         <button type="submit"> Submit </button>
         <pre>{routeWayPoints?.length}</pre>
       </form>
-      <div>{respData}</div>
+      <div>{respData!==null?"Cost "+respData['route']['costs']['fuel']+" INR":"Loading..."}</div>
     </div>
   )
 }

@@ -23,7 +23,6 @@ const connector = connect(mapStateToProps, mapDispatchToProps);
 
 type PropsFromRedux = ConnectedProps<typeof connector>;
 
-
 const Input: React.FC<PropsFromRedux> = ({ fromLocationName, toLocationName, routeWayPoints }) => {
   const [respData, setRespData] = useState<any>(null);
   

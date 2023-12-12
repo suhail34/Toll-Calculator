@@ -26,19 +26,15 @@ type PropsFromRedux = ConnectedProps<typeof connector>;
 
 const Input: React.FC<PropsFromRedux> = ({ fromLocationName, toLocationName, routeWayPoints }) => {
   const [respData, setRespData] = useState<any>(null);
-  const [formData, setFormData] = useState({
-    mapProvider: 'here',
-    polyline: '',
-  });
-
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (routeWayPoints) {
       const encodeData = encode(routeWayPoints as any);
-      setFormData((prevData) => ({
-        ...prevData,
-        polyline: encodeData,
-      }));
+      const formData = {
+          mapProvider: "here",
+          polyline: encodeData
+      }
       fetch("https://apis.tollguru.com/toll/v2/complete-polyline-from-mapping-service", {
         method: 'post',
         headers : {
@@ -49,7 +45,9 @@ const Input: React.FC<PropsFromRedux> = ({ fromLocationName, toLocationName, rou
       }).then(response => response.json())
       .then(data => {
         console.log(data);
-        setRespData(data);
+        if(data['status']=='OK') {
+          setRespData(data);
+        }
       })
       .catch(error => console.error('Error : ', error));
     } else {
